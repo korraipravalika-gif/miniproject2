@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Virtual Recipe Card Generator</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial, sans-serif;
+}
+
+body{
+    background:#f4f4f4;
+    padding:30px;
+}
+
+.container{
+    max-width:800px;
+    margin:auto;
+}
+
+.recipe-card{
+    background:white;
+    padding:30px;
+    border-radius:15px;
+    box-shadow:0 5px 20px rgba(0,0,0,.15);
+}
+
+.recipe-title{
+    text-align:center;
+    color:#d35400;
+    margin-bottom:20px;
+}
+
+.info{
+    text-align:center;
+    margin-bottom:20px;
+}
+
+.controls{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    justify-content:center;
+    margin-bottom:25px;
+}
+
+button{
+    border:none;
+    padding:12px 18px;
+    border-radius:8px;
+    cursor:pointer;
+    background:#d35400;
+    color:white;
+    font-weight:bold;
+    transition:.3s;
+}
+
+button:hover{
+    background:#a84300;
+}
+
+input{
+    padding:10px;
+    width:100px;
+    border:1px solid #ccc;
+    border-radius:8px;
+}
+
+.ingredients{
+    margin-top:20px;
+}
+
+.ingredients h2{
+    margin-bottom:10px;
+}
+
+.ingredients ul{
+    list-style:none;
+}
+
+.ingredients li{
+    padding:10px;
+    border-bottom:1px solid #eee;
+}
+
+.instructions{
+    margin-top:25px;
+}
+
+.instructions p{
+    line-height:1.7;
+}
+
+.print-btn{
+    display:block;
+    margin:25px auto 0;
+}
+
+@media print{
+
+    body{
+        background:white;
+    }
+
+    .controls,
+    .print-btn{
+        display:none;
+    }
+
+    .recipe-card{
+        box-shadow:none;
+        border:none;
+    }
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+
+<div class="recipe-card">
+
+<h1 class="recipe-title">🥞 Pancake Recipe</h1>
+
+<div class="info">
+    <h3 id="servingsText">Servings: 4</h3>
+</div>
+
+<div class="controls">
+    <button onclick="scaleRecipe(4)">1×</button>
+    <button onclick="scaleRecipe(8)">2×</button>
+    <button onclick="scaleRecipe(16)">4×</button>
+
+    <input type="number" id="customServings"
+           placeholder="Servings">
+
+    <button onclick="customScale()">Scale</button>
+</div>
+
+<div class="ingredients">
+    <h2>Ingredients</h2>
+    <ul id="ingredientList"></ul>
+</div>
+
+<div class="instructions">
+    <h2>Instructions</h2>
+    <p>
+        Mix flour, milk and eggs together until smooth.
+        Heat a lightly greased pan over medium heat.
+        Pour batter and cook until golden brown on both sides.
+        Serve warm with syrup or fruit toppings.
+    </p>
+</div>
+
+<button class="print-btn" onclick="window.print()">
+    Print Recipe Card
+</button>
+
+</div>
+</div>
+
+<script>
+
+/*
+Simulated backend recipe storage
+*/
+
+const recipe = {
+    title: "Pancake Recipe",
+    baseServings: 4,
+    ingredients: [
+        {
+            name: "Flour",
+            quantity: 2,
+            unit: "cups"
+        },
+        {
+            name: "Milk",
+            quantity: 1.5,
+            unit: "cups"
+        },
+        {
+            name: "Eggs",
+            quantity: 2,
+            unit: "pcs"
+        },
+        {
+            name: "Sugar",
+            quantity: 2,
+            unit: "tbsp"
+        },
+        {
+            name: "Butter",
+            quantity: 1,
+            unit: "tbsp"
+        }
+    ]
+};
+
+/*
+Backend scaling logic simulation
+*/
+
+function getScaledRecipe(servings){
+
+    const factor =
+        servings / recipe.baseServings;
+
+    return recipe.ingredients.map(item => ({
+        name:item.name,
+        unit:item.unit,
+        quantity:
+        Number(
+            (item.quantity * factor)
+            .toFixed(2)
+        )
+    }));
+}
+
+function renderIngredients(servings){
+
+    const ingredients =
+        getScaledRecipe(servings);
+
+    document.getElementById(
+        "servingsText"
+    ).innerText =
+    `Servings: ${servings}`;
+
+    const list =
+        document.getElementById(
+            "ingredientList"
+        );
+
+    list.innerHTML = "";
+
+    ingredients.forEach(item => {
+
+        const li =
+            document.createElement("li");
+
+        li.innerHTML =
+            `<strong>${item.quantity}</strong>
+             ${item.unit}
+             ${item.name}`;
+
+        list.appendChild(li);
+    });
+}
+
+function scaleRecipe(servings){
+    renderIngredients(servings);
+}
+
+function customScale(){
+
+    const servings =
+        Number(
+            document.getElementById(
+                "customServings"
+            ).value
+        );
+
+    if(servings <= 0 || isNaN(servings)){
+        alert(
+            "Please enter valid servings."
+        );
+        return;
+    }
+
+    renderIngredients(servings);
+}
+
+renderIngredients(4);
+
+</script>
+
+</body>
+</html>
